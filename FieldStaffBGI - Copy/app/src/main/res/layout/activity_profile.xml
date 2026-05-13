@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,22 +13,60 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My Profile"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- Profile Card -->
+        <!-- PREMIUM HEADER CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            android:backgroundTint="@color/app_primary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="24dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgProfile"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/CircleImage"/>
+
+                <!-- Worker Name -->
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Worker Name"
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="14dp"/>
+
+                <!-- Verification -->
+                <TextView
+                    android:id="@+id/tvVerification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Verified Worker ✅"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginTop="6dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- PROFILE DETAILS CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
             app:cardElevation="6dp"
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/white">
@@ -36,44 +75,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
-                <TextView
-                    android:id="@+id/tvName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp"/>
-
+                <!-- Department -->
                 <TextView
                     android:id="@+id/tvDepartment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Department:PWD"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginBottom="6dp"/>
+                    android:text="Department: Roads"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="10dp"/>
 
+                <!-- Designation -->
                 <TextView
                     android:id="@+id/tvDesignation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Designation:Field Staff"
+                    android:text="Designation: Field Staff"
                     android:textSize="16sp"
-                    android:textColor="@color/text_secondary"/>
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Worker Type -->
+                <TextView
+                    android:id="@+id/tvWorkerType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Type: Freelancer"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Duty Status -->
+                <TextView
+                    android:id="@+id/tvDutyStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Duty Status: OFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"/>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Stats Card -->
+        <!-- WORK STATS CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="6dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@color/white">
@@ -82,23 +135,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
+                <!-- Stats Title -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Work Stats"
-                    android:textSize="16sp"
+                    android:text="Work Statistics"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
-                    android:layout_marginBottom="10dp"/>
+                    android:layout_marginBottom="14dp"/>
 
+                <!-- Resolved Count -->
                 <TextView
                     android:id="@+id/tvResolved"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Resolved Tasks: 0"
-                    android:textSize="18sp"
+                    android:textSize="22sp"
                     android:textColor="@color/app_primary"
                     android:textStyle="bold"/>
 
@@ -106,16 +161,17 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Logout Button -->
+        <!-- LOGOUT BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:text="Logout"
-            android:textColor="@color/white"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
-            app:cornerRadius="12dp"
-            android:backgroundTint="@color/app_primary"/>
+            android:textSize="16sp"
+            app:cornerRadius="16dp"
+            android:backgroundTint="#E53935"/>
 
     </LinearLayout>
 

@@ -14,4 +14,9 @@
         <item name="android:statusBarColor">@color/app_primary_dark</item>
 
     </style>
+
+    <style name="CircleImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">45dp</item>
+    </style>
 </resources>
