@@ -36,6 +36,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var txtTask: TextView
     private lateinit var btnCaptureImage: Button
     private lateinit var btnSubmit: Button
+    private lateinit var btnRefresh: ImageButton
     private lateinit var switchDuty: Switch
     private lateinit var imgProfile: ImageView
 
@@ -83,6 +84,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         txtTask = findViewById(R.id.txtTask)
         btnCaptureImage = findViewById(R.id.btnCaptureImage)
         btnSubmit = findViewById(R.id.btnSubmit)
+        btnRefresh = findViewById(R.id.btnRefresh)
         switchDuty = findViewById(R.id.switchDuty)
         imgProfile = findViewById(R.id.imgProfile)
 
@@ -113,6 +115,10 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
             finish()
             return
+        }
+
+        btnRefresh.setOnClickListener {
+            refreshAssignedTask()
         }
 
         db.collection("field_staff")
@@ -239,31 +245,133 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun refreshAssignedTask() {
+
+        val uid = auth.currentUser?.uid ?: return
+
+        Toast.makeText(
+            this,
+            "Refreshing...",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        db.collection("field_staff")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+
+                if (!doc.exists()) {
+
+                    Toast.makeText(
+                        this,
+                        "Worker data not found",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@addOnSuccessListener
+                }
+
+                val assignedTask =
+                    doc.getString("assignedTask") ?: ""
+
+                if (assignedTask.isEmpty()) {
+
+                    currentRid = null
+
+                    txtTask.text =
+                        "No Assigned Task"
+
+                    txtDescription.text =
+                        "No task available."
+
+                    imgPothole.setImageResource(
+                        android.R.color.transparent
+                    )
+
+                    placeholderLayout.visibility =
+                        LinearLayout.VISIBLE
+
+                    btnCaptureImage.visibility =
+                        Button.GONE
+
+                    btnSubmit.visibility =
+                        Button.GONE
+
+                    Toast.makeText(
+                        this,
+                        "No Task Assigned",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+
+                    currentRid = assignedTask
+
+                    txtTask.text =
+                        "Task Assigned ✅"
+
+                    btnCaptureImage.visibility =
+                        Button.VISIBLE
+
+                    btnSubmit.visibility =
+                        Button.VISIBLE
+
+                    imgPothole.visibility =
+                        ImageView.VISIBLE
+
+                    loadReport(assignedTask)
+
+                    Toast.makeText(
+                        this,
+                        "Task Loaded Successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            .addOnFailureListener {
+
+                Toast.makeText(
+                    this,
+                    "Refresh Failed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
     private fun listenForTaskUpdates(uid: String) {
 
         taskListener =
             db.collection("field_staff")
                 .document(uid)
-                .addSnapshotListener { doc, _ ->
+                .addSnapshotListener { doc, error ->
 
-                    if (
-                        doc == null ||
-                        !doc.exists()
-                    ) return@addSnapshotListener
+                    if (error != null) {
+
+                        Toast.makeText(
+                            this,
+                            "Realtime listener failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        return@addSnapshotListener
+                    }
+
+                    if (doc == null || !doc.exists()) {
+                        return@addSnapshotListener
+                    }
 
                     val isOnDuty =
                         doc.getBoolean("duty_status") ?: false
 
-                    if (!isOnDuty)
+                    if (!isOnDuty) {
                         return@addSnapshotListener
+                    }
 
                     val newRid =
-                        doc.getString("assignedTask")
+                        doc.getString("assignedTask") ?: ""
 
-                    if (newRid == currentRid)
-                        return@addSnapshotListener
-
-                    if (newRid.isNullOrEmpty()) {
+                    if (newRid.isEmpty()) {
 
                         currentRid = null
 
@@ -290,24 +398,28 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                             mMap.clear()
                         }
 
-                    } else {
-
-                        currentRid = newRid
-
-                        txtTask.text =
-                            "Task Assigned"
-
-                        btnCaptureImage.visibility =
-                            Button.VISIBLE
-
-                        btnSubmit.visibility =
-                            Button.VISIBLE
-
-                        imgPothole.visibility =
-                            ImageView.VISIBLE
-
-                        loadReport(newRid)
+                        return@addSnapshotListener
                     }
+
+                    if (newRid == currentRid) {
+                        return@addSnapshotListener
+                    }
+
+                    currentRid = newRid
+
+                    txtTask.text =
+                        "Task Assigned ✅"
+
+                    btnCaptureImage.visibility =
+                        Button.VISIBLE
+
+                    btnSubmit.visibility =
+                        Button.VISIBLE
+
+                    imgPothole.visibility =
+                        ImageView.VISIBLE
+
+                    loadReport(newRid)
                 }
     }
 
@@ -570,18 +682,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                         rid,
                         downloadUrl.toString()
                     )
-
-                    loadingLayout.visibility =
-                        FrameLayout.GONE
-
-                    btnSubmit.isEnabled = true
-                    btnCaptureImage.isEnabled = true
-
-                    Toast.makeText(
-                        this,
-                        "Task Submitted Successfully ✅",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
 
                 .addOnFailureListener {
@@ -612,47 +712,72 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             .document(rid)
             .update(
                 mapOf(
-                    "status" to "Completed",
+                    "status" to "Resolved",
                     "completionImageUrl" to imageUrl,
-                    "completedAt" to System.currentTimeMillis()
+                    "completedAt" to System.currentTimeMillis(),
+                    "updatedAt" to System.currentTimeMillis()
                 )
             )
 
-        db.collection("field_staff")
-            .document(uid)
-            .update(
-                mapOf(
-                    "assignedTask" to "",
-                    "resolvedCount" to FieldValue.increment(1)
+            .addOnSuccessListener {
+
+                db.collection("field_staff")
+                    .document(uid)
+                    .update(
+                        mapOf(
+                            "assignedTask" to "",
+                            "resolvedCount" to FieldValue.increment(1)
+                        )
+                    )
+
+                selectedImageUri = null
+
+                placeholderLayout.visibility =
+                    LinearLayout.VISIBLE
+
+                imgPothole.setImageResource(
+                    android.R.color.transparent
                 )
-            )
 
-        selectedImageUri = null
+                btnCaptureImage.visibility =
+                    Button.GONE
 
-        placeholderLayout.visibility =
-            LinearLayout.VISIBLE
+                btnSubmit.visibility =
+                    Button.GONE
 
-        imgPothole.setImageResource(
-            android.R.color.transparent
-        )
+                txtTask.text =
+                    "No Assigned Task"
 
-        btnCaptureImage.visibility =
-            Button.GONE
+                txtDescription.text =
+                    "Waiting for next assignment..."
 
-        btnSubmit.visibility =
-            Button.GONE
+                loadingLayout.visibility =
+                    FrameLayout.GONE
 
-        txtTask.text =
-            "No Assigned Task"
+                btnSubmit.isEnabled = true
+                btnCaptureImage.isEnabled = true
 
-        txtDescription.text =
-            "Waiting for next assignment..."
+                Toast.makeText(
+                    this,
+                    "Task Resolved Successfully ✅",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
-        Toast.makeText(
-            this,
-            "Task Completed ✅",
-            Toast.LENGTH_SHORT
-        ).show()
+            .addOnFailureListener { e ->
+
+                loadingLayout.visibility =
+                    FrameLayout.GONE
+
+                btnSubmit.isEnabled = true
+                btnCaptureImage.isEnabled = true
+
+                Toast.makeText(
+                    this,
+                    "Firestore Update Failed: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
