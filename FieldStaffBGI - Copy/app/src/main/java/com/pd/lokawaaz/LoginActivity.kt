@@ -439,6 +439,7 @@ class LoginActivity : AppCompatActivity() {
         )
     }
 
+
     // REGISTER WORKER
     private fun registerWorker(
         workerName: String,
@@ -446,67 +447,74 @@ class LoginActivity : AppCompatActivity() {
         password: String
     ) {
 
-        Toast.makeText(
-            this,
-            "Starting Registration...",
-            Toast.LENGTH_SHORT
-        ).show()
+        // CHECK IF EMAIL ALREADY EXISTS
+        auth.fetchSignInMethodsForEmail(email)
 
-        auth.createUserWithEmailAndPassword(
-            email,
-            password
-        )
+            .addOnSuccessListener { result ->
 
-            .addOnSuccessListener {
+                val signInMethods =
+                    result.signInMethods
 
-                val uid =
-                    auth.currentUser?.uid
-                        ?: return@addOnSuccessListener
-
-                Toast.makeText(
-                    this,
-                    "Auth Created ✅",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                uploadImage(
-                    aadhaarUri!!,
-                    "aadhaar/$uid.jpg"
-                ) { aadhaarUrl ->
+                // EMAIL ALREADY REGISTERED
+                if (!signInMethods.isNullOrEmpty()) {
 
                     Toast.makeText(
                         this,
-                        "Aadhaar Uploaded ✅",
-                        Toast.LENGTH_SHORT
+                        "Email already registered ❌",
+                        Toast.LENGTH_LONG
                     ).show()
 
-                    uploadImage(
-                        selfieUri!!,
-                        "selfies/$uid.jpg"
-                    ) { selfieUrl ->
+                    return@addOnSuccessListener
+                }
+
+                // CREATE NEW ACCOUNT
+                auth.createUserWithEmailAndPassword(
+                    email,
+                    password
+                )
+
+                    .addOnSuccessListener {
+
+                        val uid =
+                            auth.currentUser?.uid
+                                ?: return@addOnSuccessListener
+
+                        uploadImage(
+                            aadhaarUri!!,
+                            "aadhaar/$uid.jpg"
+                        ) { aadhaarUrl ->
+
+                            uploadImage(
+                                selfieUri!!,
+                                "selfies/$uid.jpg"
+                            ) { selfieUrl ->
+
+                                saveWorkerData(
+                                    uid,
+                                    workerName,
+                                    email,
+                                    aadhaarUrl,
+                                    selfieUrl
+                                )
+                            }
+                        }
+                    }
+
+                    .addOnFailureListener { e ->
 
                         Toast.makeText(
                             this,
-                            "Selfie Uploaded ✅",
-                            Toast.LENGTH_SHORT
+                            "Registration Failed: ${e.message}",
+                            Toast.LENGTH_LONG
                         ).show()
-
-                        saveWorkerData(
-                            uid,
-                            workerName,
-                            email,
-                            aadhaarUrl,
-                            selfieUrl
-                        )
                     }
-                }
             }
 
             .addOnFailureListener { e ->
 
                 Toast.makeText(
                     this,
-                    "Registration Failed: ${e.message}",
+                    "Error: ${e.message}",
                     Toast.LENGTH_LONG
                 ).show()
             }

@@ -232,7 +232,12 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                 btnSubmit.isEnabled = false
                 btnCaptureImage.isEnabled = false
 
-                captureImage(currentRid!!)
+                btnSubmit.text = "Submitting..."
+
+                loadingLayout.post {
+
+                    captureImage(currentRid!!)
+                }
 
             } else {
 
@@ -691,6 +696,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     btnSubmit.isEnabled = true
                     btnCaptureImage.isEnabled = true
+                    btnSubmit.text = "Submit"
 
                     Toast.makeText(
                         this,
@@ -756,6 +762,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 btnSubmit.isEnabled = true
                 btnCaptureImage.isEnabled = true
+                btnSubmit.text = "Submit"
 
                 Toast.makeText(
                     this,
@@ -771,6 +778,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 btnSubmit.isEnabled = true
                 btnCaptureImage.isEnabled = true
+                btnSubmit.text = "Submit"
 
                 Toast.makeText(
                     this,
