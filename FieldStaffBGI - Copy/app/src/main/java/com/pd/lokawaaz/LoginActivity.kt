@@ -446,6 +446,12 @@ class LoginActivity : AppCompatActivity() {
         password: String
     ) {
 
+        Toast.makeText(
+            this,
+            "Starting Registration...",
+            Toast.LENGTH_SHORT
+        ).show()
+
         auth.createUserWithEmailAndPassword(
             email,
             password
@@ -457,15 +463,33 @@ class LoginActivity : AppCompatActivity() {
                     auth.currentUser?.uid
                         ?: return@addOnSuccessListener
 
+                Toast.makeText(
+                    this,
+                    "Auth Created ✅",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 uploadImage(
                     aadhaarUri!!,
                     "aadhaar/$uid.jpg"
                 ) { aadhaarUrl ->
 
+                    Toast.makeText(
+                        this,
+                        "Aadhaar Uploaded ✅",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
                     uploadImage(
                         selfieUri!!,
                         "selfies/$uid.jpg"
                     ) { selfieUrl ->
+
+                        Toast.makeText(
+                            this,
+                            "Selfie Uploaded ✅",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                         saveWorkerData(
                             uid,
@@ -478,12 +502,12 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
 
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
 
                 Toast.makeText(
                     this,
-                    "Registration Failed ❌",
-                    Toast.LENGTH_SHORT
+                    "Registration Failed: ${e.message}",
+                    Toast.LENGTH_LONG
                 ).show()
             }
     }
@@ -515,6 +539,15 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener {
 
                 callback(it.toString())
+            }
+
+            .addOnFailureListener { e ->
+
+                Toast.makeText(
+                    this,
+                    "Image Upload Failed: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
 
@@ -577,12 +610,12 @@ class LoginActivity : AppCompatActivity() {
                 recreate()
             }
 
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
 
                 Toast.makeText(
                     this,
-                    "Firestore Error ❌",
-                    Toast.LENGTH_SHORT
+                    "Firestore Error: ${e.message}",
+                    Toast.LENGTH_LONG
                 ).show()
             }
     }
